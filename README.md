@@ -7,7 +7,7 @@ I have implemented
 3) function test(i, j, k, board) that checks if that is allowed to put a token of value k on row i column j,
 4) test_board() that checks if a board full of tokens are correct solution indeed.
 
-I am implementing the solve() function that solves a given sudoku puzzle right now.
+I have also implemented the solve() function that solves a given sudoku puzzle.
 
 The code is pure ATS up to now.
 Other fancy features including animation will be added to the project later on.
