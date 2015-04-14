@@ -7,10 +7,10 @@ sudoku: sudoku.dats
 	$(PATSCC) -DATS_MEMALLOC_LIBC -o $@ $^
 
 clean:
-	rm -f *~ *_ats.c
+	rm -f *~ *_dats.c
 
-cleanall:
-	clean \
+cleanall:: clean
+cleanall::
 	rm -f sudoku
 
 .PHONY: all clean cleanall

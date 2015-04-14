@@ -121,7 +121,7 @@ in
 end
 
 fun
-board_set(bd: int99, i: int, j: int, k: int): int99 = let
+board_set_grid(bd: int99, i: int, j: int, k: int): int99 = let
 	val '(r0, r1, r2, r3, r4, r5, r6, r7, r8) = bd
 in
 	if i = 0 then let val r0 = row_set_grid(r0, j, k) in '(r0, r1, r2, r3, r4, r5, r6, r7, r8) end
@@ -139,7 +139,7 @@ end
 fun
 test_row(i: int, j: int, k: int, bd: int99, m: int): bool =
 if m = j then
-	true
+	test_row(i, j, k, bd, m + 1)
 else if m = N then
 	true
 else if k != board_get_grid(bd, i, m) then
@@ -150,7 +150,7 @@ else
 fun
 test_col(i: int, j: int, k: int, bd: int99, m: int): bool =
 if m = i then
-	true
+	test_col(i, j, k, bd, m + 1)
 else if m = N then
 	true
 else if k != board_get_grid(bd, m, j) then
@@ -164,8 +164,8 @@ test_blk(i: int, j: int, k: int, bd: int99): bool = let
 	val j0 = j / 3
 	fun test_blk_aux(i: int, j: int, k: int, bd: int99, m: int, n: int): bool =
 		if m = i && n = j then
-			true
-		else if m = i0 * 3 + 3 && n = j0 * 3 + 3 then
+			test_blk_aux(i, j, k, bd, m, n + 1)
+		else if m = i0 * 3 + 3 then
 			true
 		else if n = j0 * 3 + 3 then
 			test_blk_aux(i, j, k, bd, m + 1, j0 * 3)
@@ -191,7 +191,7 @@ fun
 test_board(bd: int99): bool = let
 	fun
 	test_board_aux(bd: int99, i: int, j: int): bool =
-	if i = N && j = 0 then
+	if i = N then
 		true
 	else if j = N then
 		test_board_aux(bd, i + 1, 0)
@@ -207,7 +207,7 @@ fun
 is_full(bd: int99): bool = let
 	fun
 	is_full_aux(bd: int99, i: int, j: int): bool =
-	if i = N && j = 0 then
+	if i = N then
 		true
 	else if j = N then
 		is_full_aux(bd, i + 1, 0)
@@ -227,9 +227,25 @@ implement
 solve(bd) = let
 	fun
 	solve_aux(bd: int99, i: int, j: int, k: int): int99 =
-	if i = N - 1 && j = N - 1 && k = 10 then
+	if i = N then
 		bd
-	else if 
+	else if j = N then
+		solve_aux(bd, i + 1, 0, 1)
+	else if board_get_grid(bd, i, j) != 0 then
+		solve_aux(bd, i, j + 1, 1)
+	else if k = N + 1 then
+		bd
+	else if test(i, j, k, bd) then let
+			val bd2 = board_set_grid(bd, i, j, k)
+			val bd3 = solve_aux(bd2, i, j + 1, 1)
+		in
+			if is_full(bd3) then
+				bd3
+			else
+				solve_aux(bd, i, j, k + 1)
+		end
+	else
+		solve_aux(bd, i, j, k + 1)
 in
 	solve_aux(bd, 0, 0, 1)
 end
@@ -244,6 +260,18 @@ val board = '(
 		'( 0, 6, 0, 0, 0, 0, 2, 8, 0 ),
 		'( 0, 0, 0, 4, 1, 9, 0, 0, 5 ),
 		'( 0, 0, 0, 0, 8, 0, 0, 7, 9 )
+		)
+
+val board_par = '(
+		'( 5, 3, 4, 6, 7, 8, 9, 1, 2 ),
+		'( 6, 7, 2, 1, 9, 5, 3, 4, 8 ),
+		'( 1, 9, 8, 3, 4, 2, 5, 6, 7 ),
+		'( 8, 5, 9, 7, 6, 1, 4, 2, 3 ),
+		'( 4, 2, 6, 8, 5, 3, 7, 9, 1 ),
+		'( 7, 1, 3, 9, 2, 4, 8, 5, 6 ),
+		'( 9, 6, 1, 5, 3, 7, 2, 8, 0 ),
+		'( 2, 8, 7, 4, 1, 9, 0, 0, 5 ),
+		'( 3, 4, 5, 2, 8, 6, 0, 7, 9 )
 		)
 
 val board_sol = '(
@@ -263,13 +291,15 @@ implement main0() = {
 	val () = print_board(board)		
 
 	val solved = solve(board)
-	//val solved = board
 	val () = println! ("\nand its solution:")
 	val () = print_board(solved)
 
-	//val ret = test(1, 1, 9, board)
-	//val () = assertloc (ret = true)
+	val ret = is_full(board)
+	val () = assertloc (ret = false)
 
-	//val ret = test_board(board_sol)
-	//val () = assertloc (ret = true)
+	val ret = is_full(board_sol)
+	val () = assertloc (ret = true)
+
+	val ret = test_board(solved)
+	val () = assertloc (ret = true)
 }
