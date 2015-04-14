@@ -1,5 +1,4 @@
-# sudoku_ats
-This is the project for cs520 programming languages. The project is to implement a sudoku solver in ATS.
+My project is to implement a sudoku solver in ATS.
 
 I have implemented
 1) several get() and set() like functions to manipulate the board,
@@ -11,3 +10,6 @@ I am implementing the solve() function that solves a given sudoku puzzle right n
 
 The code is pure ATS up to now.
 Other fancy features including animation will be added to the project later on.
+
+The github repository is
+https://github.com/jxunix/sudoku_ats
