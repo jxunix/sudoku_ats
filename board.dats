@@ -48,7 +48,7 @@ is_full_board
 		if rt then
 			sif m == N - 1 && n == N - 1 then
 				true
-			else sif n == N - 1 then
+			else if n = N - 1 then
 				is_full_board_aux(board, m + 1, 0)
 			else
 				is_full_board_aux(board, m, n + 1)
@@ -61,71 +61,128 @@ end
 
 implement
 is_valid_by_row
-	{m}{n}
-	(board, m: int(m), n: int(n), piece) = let
+	{n}
+	(row, n: int(n), piece) = let
 	fun
 	is_valid_by_row_aux
-		{m: nat | m < N}{n: nat | n < N}{i: nat | i < N}
-		(board, m: int(m), n: int(n), i: int(i), piece): bool = let
-		val gd = board_get_grid(board, m, i)
+		{n: nat | n < N}{i: nat | i < N}
+		(row, n: int(n), i: int(i), piece): bool = let
+		val gd = row_get_grid(row, i)
 		val rt = equals_grid(gd, GRIDfil(piece))
 	in
-		if rt then
-			false
+		if i = N - 1 && i = n then
+			true
+		else if i = N - 1 then
+			~rt
+		else if i = n then
+			is_valid_by_row_aux(row, n, i + 1, piece)
 		else
-			sif i == N - 1 then
-				true
+			if rt then
+				false
 			else
-				is_valid_by_row_aux(board, m, n, i + 1, piece)
+				is_valid_by_row_aux(row, n, i + 1, piece)
 	end
 in
-	is_valid_by_row_aux(board, m, n, 0, piece)
+	is_valid_by_row_aux(row, n, 0, piece)
 end
 
 implement
 is_valid_by_col
-	{m}{n}
-	(board, m: int(m), n: int(n), piece) = let
+	{n}
+	(col, n: int(n), piece) = let
 	fun
 	is_valid_by_col_aux
-		{m: nat | m < N}{n: nat | n < N}{i: nat | i < N}
-		(board, m: int(m), n: int(n), i: int(i), piece): bool = let
-		val gd = board_get_grid(board, i, n)
+		{n: nat | n < N}{i: nat | i < N}
+		(col, n: int(n), i: int(i), piece): bool = let
+		val gd = col_get_grid(col, i)
 		val rt = equals_grid(gd, GRIDfil(piece))
 	in
-		if rt then
-			false
+		if i = N - 1 && i = n then
+			true
+		else if i = N - 1 then
+			~rt
+		else if i = n then
+			is_valid_by_col_aux(col, n, i + 1, piece)
 		else
-			sif i == N - 1 then
-				true
+			if rt then
+				false
 			else
-				is_valid_by_col_aux(board, m, n, i + 1, piece)
+				is_valid_by_col_aux(col, n, i + 1, piece)
 	end
 in
-	is_valid_by_col_aux(board, m, n, 0, piece)
-end
-
-fun
-is_valid_by_blk_aux
-	{n: nat | n < N}
-	(blk, n: int(n), piece): bool = let
-	val gd = blk_get_grid(blk, n)
-	val rt = equals_grid(gd, GRIDfil(piece))
-in
-	if rt then
-		false
-	else
-		sif n == N - 1 then
-			true
-		else
-			is_valid_by_blk_aux(blk, n + 1, piece)
+	is_valid_by_col_aux(col, n, 0, piece)
 end
 
 implement
 is_valid_by_blk
-	{m}{n}
-	(board, m: int(m), n: int(n), piece) = let
-	val blk = board_get_blk(board, m, n)
+	{n}
+	(blk, n: int(n), piece) = let
+	fun
+	is_valid_by_blk_aux
+		{n: nat | n < N}{i: nat | i < N}
+		(blk, n: int(n), i: int(i), piece): bool = let
+		val gd = blk_get_grid(blk, i)
+		val rt = equals_grid(gd, GRIDfil(piece))
+	in
+		if i = N - 1 && i = n then
+			true
+		else if i = N - 1 then
+			~rt
+		else if i = n then
+			is_valid_by_blk_aux(blk, n, i + 1, piece)
+		else
+			if rt then
+				false
+			else
+				is_valid_by_blk_aux(blk, n, i + 1, piece)
+	end
 in
-	is_valid_by_blk_aux(blk, 0, piece)
+	is_valid_by_blk_aux(blk, n, 0, piece)
+end
+
+(*)
+implement
+board_get_candidates
+	{m}{n}
+	(board, m: int(m), n: int(n)) = let
+	fun
+	board_get_candidates_aux
+		{m: nat | m < N}{n: nat | n < N}{i: nat | i < N}
+		(board, m: int(m), n: int(n), i: int(i)): candidates = 
+in
+end
+*)
+
+implement
+is_valid_board
+	(board) = let
+	fun
+	is_valid_board_aux
+		{m: nat | m < N}{n: nat | n < N}
+		(board, m: int(m), n: int(n)): bool = let
+		val gd = board_get_grid(board, m, n)
+	in
+		case+ gd of
+		| GRIDemp() => false
+		| GRIDfil(pc) => let
+			val row = board_get_row(board, m)
+			val col = board_get_col(board, n)
+			val (blk, i, j) = board_get_blk(board, m, n)
+			val test1 = is_valid_by_row(row, n, pc)
+			val test2 = is_valid_by_col(col, m, pc)
+			val test3 = is_valid_by_blk(blk, j, pc)
+		in
+			if test1 && test2 && test3 then
+				sif m == N - 1 && n == N - 1 then
+					true
+				else if n = N - 1 then
+					is_valid_board_aux(board, m + 1, 0)
+				else
+					is_valid_board_aux(board, m, n + 1)
+			else
+				false
+		end
+	end
+in
+	is_valid_board_aux(board, 0, 0)
 end

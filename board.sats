@@ -94,14 +94,16 @@ board_set_blk
 	{n: nat | n < N}
 	(board, int(n), blk): board
 
+(*
+ * Given a 2d coordinate in the board
+ * get the corresponding block
+ * compute the index of the block in the board
+ * and the index of the grid in the block
+ *)
 fun
 board_get_blk
 	{m: nat | m < N}{n: nat | n < N}
-	(board, int(m), int(n)): blk
-fun
-board_set_blk
-	{m: nat | m < N}{n: nat | n < N}
-	(board, int(m), int(n), blk): board
+	(board, int(m), int(n)): [i: nat | i < N][j: nat | j < N] (blk, int(i), int(j))
 
 fun
 row_get_grid
@@ -132,18 +134,18 @@ blk_set_grid
 
 fun
 is_valid_by_row
-	{m: nat | m < N}{n: nat | n < N}
-	(board, int(m), int(n), piece): bool
+	{n: nat | n < N}
+	(row, int(n), piece): bool
 
 fun
 is_valid_by_col
-	{m: nat | m < N}{n: nat | n < N}
-	(board, int(m), int(n), piece): bool
+	{n: nat | n < N}
+	(col, int(n), piece): bool
 
 fun
 is_valid_by_blk
-	{m: nat | m < N}{n: nat | n < N}
-	(board, int(m), int(n), piece): bool
+	{n: nat | n < N}
+	(blk, int(n), piece): bool
 
 fun
 board_get_candidates
