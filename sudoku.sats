@@ -7,8 +7,76 @@
 
 #include "share/atspre_staload.hats"
 
-#define N 9
+#define M 3
+#define N M*M
 
+// board is a container essentially
+abstype board
+
+fun
+{a: t@ype}
+is_valid_board
+	(board): bool
+
+fun
+{a: t@ype}
+is_full_board
+	(board): bool
+
+// row, colomun and block are smaller container than board
+abstype row
+abstype col
+abstype blk
+
+fun
+{a: t@ype}
+board_get_row{n: nat | n < N}
+	(board, int(n)): row
+
+fun
+{a: t@ype}
+board_get_col{n: nat | n < N}
+	(board, int(n)): col
+									 
+fun
+{a: t@ype}
+board_get_blk{n: nat | n < N}
+	(board, int(n)): blk
+
+fun
+{a: t@ype}
+is_valid_row
+	(row): bool
+
+fun
+{a: t@ype}
+is_valid_col
+	(col): bool
+
+fun
+{a: t@ype}
+is_valid_blk
+	(blk): bool
+
+abstype piece
+abstype candidates
+
+fun
+{a: t@ype}
+board_get_piece{m: nat | m < N}{n: nat | n < N}
+	(board, int(m), int(n)): piece
+
+fun
+{a: t@ype}
+board_set_piece{m: nat | m < N}{n: nat | n < N}
+	(board, int(m), int(n)): board
+
+fun
+{a: t@ype}
+board_get_candidates{m: nat | m < N}{n: nat | n < N}
+	(board, int(m), int(n)): candidates
+
+////
 abstype piece
 abstype row
 abstype col
@@ -18,15 +86,10 @@ datatype grid =
 | grid_emp of (row, col)
 | grid_fil of (piece, row, col)
 
-datatype list(a: t@ype, int) =
-| list_nil(a, 0) of ()
-| {n: nat}
-	list_con(a, n+1) of (a, list(a, n))
-
 typedef rows = list(piece, N)
 typedef cols = list(piece, N)
 typedef blks = list(piece, N)
-typedef candidate = [n: nat | n < N] list(piece, n)
+typedef candidates = [n: nat | n < N] list(piece, n)
 
 typedef board_rowwise = list(rows, N)
 typedef board_colwise = list(cols, N)
@@ -86,11 +149,11 @@ is_full(board): bool
 
 fun
 {a: t@ype}
-get_candidate(board, row, col): candidate
+get_candidate(board, row, col): candidates
 
 fun
 {a: t@ype}
-put(board, row, col, candidate): board
+put(board, row, col, candidates): board
 
 fun
 {a: t@ype}
