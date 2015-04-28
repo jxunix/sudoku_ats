@@ -47,7 +47,7 @@ fun
 {a: t@ype}
 list_split{n: int}{i: nat | i <= n}
 	(list(a, n), int(i)): (list(a, i), list(a, n-i))
-
+												 
 fun
 {a: t@ype}
 matlst_get_col{m, n: int}{i: nat | i < n}
