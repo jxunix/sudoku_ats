@@ -11,10 +11,13 @@
 #define N M*M
 
 typedef piece = int
+(*)
 datatype container(a: t@ype, n: int) =
 | CONnil(a, 0) of ()
 | {n: nat}
 	CONcon(a, n + 1) of (a, container(a, n))
+*)
+typedef container(a: t@ype, n: int) = list(a, n)
 
 fun
 {a: t@ype}
@@ -53,12 +56,7 @@ typedef row = container(grid, N)
 typedef col = container(grid, N)
 typedef blk = container(grid, N)
 
-	(*)
-datatype cand(int) =
-| CANDnil(0) of ()
-| {n: nat | n > 0; n < N}
-	CANDcon(n + 1) of (piece, cand(n))
-	*)
+typedef cand = List0(piece)
 
 fun
 equals_piece
@@ -197,13 +195,11 @@ is_valid_by_blk
 	{n: nat | n < N}
 	(blk, int(n), piece): bool
 
-////
 fun
 board_get_cand
 	{m: nat | m < N}{n: nat | n < N}
-	(board, int(m), int(n)): [l: nat | l <= N] cand(l)
+	(board, int(m), int(n)): cand
 
 fun
-cand_get_next_piece
-	{l: nat | l > 0; l <= N}
-	(cand(l)): (piece, cand(l - 1))
+print_cand
+	(cand): void

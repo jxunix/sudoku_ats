@@ -16,46 +16,22 @@ container_new
 	(a, n) =
 (
 	if n = 0 then
-		CONnil()
+		list_nil()
 	else
-		CONcon(a, container_new(a, n - 1))
+		list_cons(a, container_new(a, n - 1))
 )
 
 implement
 {a}
 container_get
 	(container, i) =
-(
-case+ container of
-|	CONcon(a, con) =>
-	(
-		if i = 0 then
-			a
-		else
-			container_get(con, i - 1)
-	)
-)
+	list_get_at(container, i)
 
 implement
 {a}
 container_set
 	(container, i, a) =
-(
-case+ container of
-| CONcon(a2, con) =>
-	(
-		if i = 0 then let
-			val a2 = a
-		in
-			container
-		end
-		else let
-			val con = container_set(con, i - 1, a)
-		in
-			CONcon(a2, con)
-		end
-	)
-)
+	list_set_at(container, i, a)
 
 implement
 equals_piece
@@ -70,7 +46,16 @@ equals_piece
 implement
 grid_new
 	() =
-	GRIDfil(1)
+	GRIDemp()
+
+implement
+print_grid
+	(grid) =
+(
+case+ grid of
+| GRIDemp() => print " - "
+| GRIDfil(pc) => print! (" ", pc, " ")
+)
 
 implement
 is_full_grid
@@ -79,15 +64,6 @@ is_full_grid
 case+ grid of
 | GRIDemp() => false
 | GRIDfil(pc) => true
-)
-
-implement
-print_grid
-	(grid) =
-(
-case+ grid of
-| GRIDemp() => print " 0 "
-| GRIDfil(pc) => print! (" ", pc, " ")
 )
 
 implement
@@ -103,8 +79,7 @@ case+ gd1 of
 	| GRIDemp() =>
 		false
 	| GRIDfil(pc2) =>
-		equals_piece(pc1, pc2)
-	)
+		equals_piece(pc1, pc2))
 )
 
 implement
@@ -124,9 +99,9 @@ print_board
 		(board, m: int(m), n: int(n)): void = let
 		val grid = board_get_grid(board, m, n)
 		val () = print_grid(grid)
-		val () = print! ("<", m, ",", n, ">")
 	in
 		if (m = N - 1) * (n = N - 1) then let
+			val () = println! ()
 			val () = println! ()
 		in
 			()
@@ -536,16 +511,15 @@ in
 	is_valid_by_blk_aux(blk, n, 0, piece)
 end
 
-	 ////
 extern
 fun
 board_get_cand_aux
-	{m: nat | m < N}{n: nat | n < N}{k: nat | k < N}{l: nat | l < N}
-	(board, m: int(m), n: int(n), k: int(k), cand(l)): [l2: nat | l2 >= l; l2 <= l + 1] cand(l2)
+	{m: nat | m < N}{n: nat | n < N}{k: nat | k > 0; k <= N}
+	(board, m: int(m), n: int(n), k: int(k), cand): cand
 
 implement
 board_get_cand_aux
-	{m}{n}{k}{l}
+	{m}{n}{k}
 	(board, m, n, k, cand) = let
 	val row = board_get_row(board, m)
 	val col = board_get_col(board, n)
@@ -555,14 +529,14 @@ board_get_cand_aux
 	val test2 = is_valid_by_col(col, m, pc)
 	val test3 = is_valid_by_blk(blk, j, pc)
 in
-	if k = N - 1 then
+	if k = N then
 		if test1 * test2 * test3 then
-			CANDcon(k, cand)
+			list_cons(k, cand)
 		else
 			cand
 	else
 		if test1 * test2 * test3 then
-			board_get_cand_aux(board, m, n, k + 1, CANDcon(k, cand))
+			board_get_cand_aux(board, m, n, k + 1, list_cons(k, cand))
 		else
 			board_get_cand_aux(board, m, n, k + 1, cand)
 end
@@ -571,6 +545,25 @@ implement
 board_get_cand
 	{m}{n}
 	(board, m: int(m), n: int(n)) = let
+	val grid = board_get_grid(board, m, n)
 in
-	board_get_cand_aux(board, m, n, 1, CANDnil())
+	case+ grid of
+	| GRIDemp() =>
+		board_get_cand_aux(board, m, n, 1, list_nil())
+	| GRIDfil(pc) =>
+		list_nil()
 end
+
+implement
+print_cand
+	(cand) =
+(
+	case+ cand of
+	| list_nil() =>
+		println! ()
+	| list_cons(pc, cand2) => let
+		val () = print! (pc, " ")
+	in
+		print_cand(cand2)
+	end
+)
