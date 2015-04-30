@@ -70,7 +70,7 @@ equals_piece
 implement
 grid_new
 	() =
-	GRIDfil(1)
+	GRIDemp()
 
 implement
 is_full_grid
@@ -87,7 +87,7 @@ print_grid
 (
 case+ grid of
 | GRIDemp() => print " 0 "
-| GRIDfil(pc) => print! (" ", pc, " ")
+| GRIDfil(pc) => print! (pc)
 )
 
 implement
@@ -124,7 +124,6 @@ print_board
 		(board, m: int(m), n: int(n)): void = let
 		val grid = board_get_grid(board, m, n)
 		val () = print_grid(grid)
-		val () = print! ("<", m, ",", n, ">")
 	in
 		if (m = N - 1) * (n = N - 1) then let
 			val () = println! ()
